@@ -6,6 +6,7 @@ Questions:
         Do we need to do something with the public IP?
 
     How can we automate the setup we need?
+        nginx
         Metrics server
         Dashboard
         Prometheus
@@ -13,7 +14,6 @@ Questions:
         Jenkins
 
     How do we persist these using Persistent Volumes and PersistentVolumeClaims?
-
 
 General Links:
     Terraform AWS resources
@@ -33,6 +33,7 @@ Notes:
 		endpoint_private_access ?
 
 	manual installation:
+
         Installing Kubernetes Metrics Server
 
             https://docs.aws.amazon.com/eks/latest/userguide/metrics-server.html
@@ -45,8 +46,8 @@ Notes:
 
             https://docs.aws.amazon.com/eks/latest/userguide/prometheus.html
 
-
         Using Helm with EKS
+
             https://docs.aws.amazon.com/eks/latest/userguide/helm.html
 
         Installing Jenkins
