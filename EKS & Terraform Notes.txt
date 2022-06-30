@@ -1,7 +1,7 @@
 Questions:
 
     How do we publicly expose the cluster to the internet? That is, in a way that our servers can actually serve requests from outside the cluster.
-        Maybe the answer is with nginx deployment & ingresses, and then a loadbalancer or cluster IP that is the inbetween nginx and our front end?
+        Maybe the answer is with nginx deployment & ingresses, and then a loadbalancer or cluster IP? What is going on here?
         Do we need to modify VPC?
         Do we need to do something with the public IP?
 
