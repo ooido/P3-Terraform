@@ -1,11 +1,26 @@
+Questions:
+
+    How do we publicly expose the cluster to the internet? That is, in a way that our servers can actually serve requests from outside the cluster.
+        Maybe the answer is with nginx deployment & ingresses, and then a loadbalancer or cluster IP that is the inbetween nginx and our front end?
+        Do we need to modify VPC?
+        Do we need to do something with the public IP?
+
+    How can we automate the setup we need?
+        Metrics server
+        Dashboard
+        Prometheus
+        Grafana
+        Jenkins
+
+    How do we persist these using Persistent Volumes and PersistentVolumeClaims?
+
+
 General Links:
 	https://registry.terraform.io/providers/hashicorp/aws/2.52.0/docs/resources/eks_cluster
 	
 	https://learn.hashicorp.com/tutorials/terraform/kubernetes-provider
 	
 	https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
-	
-	
 
 Notes:
 
