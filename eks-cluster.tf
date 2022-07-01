@@ -1,8 +1,8 @@
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "17.24.0"
+  version         = "18.26.2"
   cluster_name    = local.cluster_name
-  cluster_version = "1.20"
+  cluster_version = "1.24"
   subnets         = module.vpc.private_subnets
 
   vpc_id = module.vpc.vpc_id
@@ -16,7 +16,7 @@ module "eks" {
       name                          = "worker-main"
       instance_type                 = "m5.xlarge" # was t4g.xlarge, but we realized ARM instruction set might be problematic
       additional_userdata           = "echo P3 Nodes" 
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+      additional_security_group_ids = [aws_security_group.all_worker_mgmt.id]
       asg_desired_capacity          = 4
     },
   ]
