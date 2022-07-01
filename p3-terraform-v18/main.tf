@@ -17,6 +17,7 @@ provider "kubernetes" {
 
 locals {
     cluster_name = "ben-project-3-sre"
+    region = "us-east-1"
 }
 
 
@@ -84,7 +85,7 @@ module "eks" {
    # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    instance_types = ["t3.large"]
 
     attach_cluster_primary_security_group = true
     vpc_security_group_ids                = [aws_security_group.additional.id]
@@ -93,32 +94,15 @@ module "eks" {
   eks_managed_node_groups = {
     blue = {}
     green = {
-      min_size     = 1
-      max_size     = 10
-      desired_size = 1
+      min_size     = 2
+      max_size     = 6
+      desired_size = 3
 
       instance_types = ["t3.large"]
-      capacity_type  = "SPOT"
-      labels = {
-        Environment = "test"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
-      }
-
-      taints = {
-        dedicated = {
-          key    = "dedicated"
-          value  = "gpuGroup"
-          effect = "NO_SCHEDULE"
-        }
-      }
+      capacity_type  = "ON_DEMAND"
 
       update_config = {
         max_unavailable_percentage = 50 # or set `max_unavailable`
-      }
-
-      tags = {
-        ExtraTag = "example"
       }
     }
   }
@@ -128,11 +112,7 @@ module "eks" {
 
   aws_auth_node_iam_role_arns_non_windows = [
     module.eks_managed_node_group.iam_role_arn,
-    module.self_managed_node_group.iam_role,arn,
   ]
-  aws_auth_fargate_profile_pod_execution_role_arns = [
-    module.fargate_profile.fargate_profile_pod_execution_role_arn
-  ]  
 
   aws_auth_users = [
     {
@@ -172,8 +152,6 @@ module "vpc" {
     "kubernetes.io/cluster/${local.name}" = "shared"
     "kubernetes.io/role/internal-elb"     = 1
   }
-
-  tags = local.tags
 }
 
 resource "aws_security_group" "additional" {
@@ -193,6 +171,4 @@ resource "aws_security_group" "additional" {
     protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = local.tags
 }
