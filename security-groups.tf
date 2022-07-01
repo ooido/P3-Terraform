@@ -37,6 +37,13 @@ resource "aws_security_group" "all_worker_mgmt" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+  ingress {
+    from_port = 1025
+    to_port = 65535
+    protocol = "tcp"
+    cidr_blocks = [module.vpc.private_subnets]
+  }
+
     egress {
     from_port        = 0
     to_port          = 0
