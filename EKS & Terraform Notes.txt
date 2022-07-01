@@ -34,6 +34,11 @@ Notes:
 
 	manual installation:
 
+
+        Using Helm with EKS
+            Charts -> https://artifacthub.io
+            https://docs.aws.amazon.com/eks/latest/userguide/helm.html
+
         Installing Kubernetes Metrics Server
 
             https://docs.aws.amazon.com/eks/latest/userguide/metrics-server.html
@@ -46,10 +51,7 @@ Notes:
 
             https://docs.aws.amazon.com/eks/latest/userguide/prometheus.html
 
-        Using Helm with EKS
-
-            https://docs.aws.amazon.com/eks/latest/userguide/helm.html
-
         Installing Jenkins
 
             https://www.jenkins.io/doc/book/installing/kubernetes/
+            https://artifacthub.io/packages/helm/jenkinsci/jenkins#configuration

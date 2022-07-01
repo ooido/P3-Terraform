@@ -14,7 +14,7 @@ module "eks" {
   worker_groups = [
     {
       name                          = "worker-main"
-      instance_type                 = "t4g.xlarge"
+      instance_type                 = "m5.xlarge" # was t4g.xlarge, but we realized ARM instruction set might be problematic
       additional_userdata           = "echo P3 Nodes" 
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
       asg_desired_capacity          = 4
