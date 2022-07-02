@@ -20,6 +20,8 @@ locals {
     region = "us-east-1"
 }
 
+data "aws_caller_identity" "current" {}
+
 
 
 ############
@@ -85,7 +87,7 @@ module "eks" {
    # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["t3.large"]
+    instance_types = ["t3.micro"]
 
     attach_cluster_primary_security_group = true
     vpc_security_group_ids                = [aws_security_group.additional.id]
@@ -98,7 +100,7 @@ module "eks" {
       max_size     = 6
       desired_size = 3
 
-      instance_types = ["t3.large"]
+      instance_types = ["t3.micro"]
       capacity_type  = "ON_DEMAND"
 
       update_config = {
@@ -110,14 +112,10 @@ module "eks" {
   #Auth Config
   manage_aws_auth_configmap = true
 
-  aws_auth_node_iam_role_arns_non_windows = [
-    module.eks_managed_node_group.iam_role_arn,
-  ]
-
   aws_auth_users = [
     {
-      userarn  = "arn:aws:iam::66666666666:user/sre-ben-project3"
-      username = "sre-ben-project3"
+      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/kube"
+      username = "kube"
       groups   = ["system:masters"]
     },
   ]
@@ -127,7 +125,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name = local.name
+  name = local.cluster_name
   cidr = "10.0.0.0/16"
 
   azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
@@ -144,18 +142,18 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/elb"              = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"     = 1
   }
 }
 
 resource "aws_security_group" "additional" {
-  name_prefix = "${local.name}-additional"
+  name_prefix = "${local.cluster_name}-additional"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
@@ -171,4 +169,51 @@ resource "aws_security_group" "additional" {
     protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+    ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_iam_user" "kube" {
+    name = "kube"
+    path = "/system/"
+}
+
+resource "aws_iam_access_key" "kube" {
+    user = aws_iam_user.kube.name
+}
+
+resource "aws_iam_user_policy" "kubernetes-access" {
+    depends_on = [
+      module.eks
+    ]
+    name= "access"
+    user = aws_iam_user.kube.name
+
+    policy = jsonencode({    
+        "Version": "2012-10-17",
+        "Statement":[ 
+            {
+                "Sid":"VisualEditor0",
+                "Effect":"Allow",
+                "Action":[
+                "eks:AccessKubernetesApi",
+                "eks:DescribeCluster",
+                "eks:ListClusters"],
+                "Resource":"${module.eks.cluster_arn}"
+            }
+        ]
+    })
 }

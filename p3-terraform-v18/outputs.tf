@@ -3,6 +3,16 @@ output "cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
+output "region" {
+    description = "Region that the cluster is in"
+    value = local.region
+}
+
+output "cluster_name" {
+  description = "The cluster name"
+  value = local.cluster_name
+}
+
 output "cluster_certificate_authority_data" {
   description = "Base64 encoded certificate data required to communicate with the cluster"
   value       = module.eks.cluster_certificate_authority_data
@@ -46,7 +56,10 @@ output "cluster_security_group_arn" {
 
 
 #Iam user
-output "cluster_iam_access_key" {
+output "iam_access_key" {
     description = "Access key for our iam group"
-    value = module.eks.cluster_iam_access_key  
+    value = aws_iam_access_key.kube.secret
+    sensitive = true
 }
+
+
